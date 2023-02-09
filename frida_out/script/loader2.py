@@ -21,8 +21,16 @@ def download_file(file):
     download_count = download_count + 1
 
 device = frida.get_usb_device()
-process = device.get_process("Dynamic Code Loading Example")
-time.sleep(1) #Without it Java.perform silently fails
+
+while True:
+    try:
+        process = device.get_process("Dynamic Code Loading Example")
+        break
+    except frida.ProcessNotFoundError:
+        
+        time.sleep(0.01)
+
+# time.sleep(1) #Without it Java.perform silently fails
 session = device.attach(process.pid)
 script = session.create_script(open("s2.js").read())
 script.on('message', on_message)
