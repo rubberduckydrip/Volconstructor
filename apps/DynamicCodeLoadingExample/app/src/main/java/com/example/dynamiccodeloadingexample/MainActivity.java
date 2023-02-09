@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -15,10 +16,7 @@ public class MainActivity extends AppCompatActivity {
 
     static String TAG = "DYNAMIC_CODE_LOADING_EXAMPLE";
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    public void loadAndRunCode(View view) {
         Context context = getApplicationContext();
 
         String path = context.getFilesDir().getAbsolutePath();
@@ -60,5 +58,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         Log.i(TAG, "Answer: " + result);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
     }
 }
