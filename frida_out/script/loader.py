@@ -2,27 +2,30 @@
 
 import frida
 import time
-from ppadb.client import Client as AdbClient
+from adbutils import adb
+
+download_count = 0
 
 def on_message(message, data):
     if(message['type'] == 'send'):
         print("[+] Received: ")
         print(message['payload'])
-        downlaod_file(message['payload'])
+        download_file(message['payload'])
 
-def downlaod_file(file):
-    client = AdbClient(host="127.0.0.1", port=5037)
-    device = client.device("emulator-5554")
+def download_file(file):
+    global download_count
+    device = adb.device()
 
     print("[+] Pulling file: " + file)
-    device.pull(file, "outputs/")
+    device.sync.pull(file, "outputs/" + "dynamic_code_" + str(download_count) + ".dump")
+    download_count = download_count + 1
 
 device = frida.get_usb_device()
 pid = device.spawn(["com.example.dynamiccodeloadingexample"])
 device.resume(pid)
 time.sleep(1) #Without it Java.perform silently fails
 session = device.attach(pid)
-script = session.create_script(open("s3.js").read())
+script = session.create_script(open("s2.js").read())
 script.on('message', on_message)
 script.load()
 

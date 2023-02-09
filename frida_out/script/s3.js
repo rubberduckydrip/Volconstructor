@@ -81,5 +81,3 @@ Java.perform(function(){
     
 
 })
-
-input()
