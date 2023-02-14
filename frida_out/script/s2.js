@@ -1,3 +1,5 @@
+// Get the path of the dex file loaded by DexClassLoader
+
 Java.perform(function(){
     let dexclassLoader = Java.use("dalvik.system.DexClassLoader");
     console.log("[+] Hooking DexFile.loadDex")

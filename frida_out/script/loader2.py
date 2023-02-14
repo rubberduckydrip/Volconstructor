@@ -1,4 +1,5 @@
 # original source: https://book.hacktricks.xyz/mobile-pentesting/android-app-pentesting/frida-tutorial/frida-tutorial-2
+# Waits for the process to start and then attaches to it
 
 import frida
 import time

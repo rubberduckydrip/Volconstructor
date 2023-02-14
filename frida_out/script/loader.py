@@ -1,4 +1,5 @@
 # original source: https://book.hacktricks.xyz/mobile-pentesting/android-app-pentesting/frida-tutorial/frida-tutorial-2
+# Spawns the target app and injects the script
 
 import frida
 import time
