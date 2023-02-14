@@ -26,12 +26,22 @@ public class MainActivity extends AppCompatActivity {
 
         final DexClassLoader classLoader = new DexClassLoader(apkPath, context.getCacheDir().getAbsolutePath(), null, this.getClass().getClassLoader());
 
+
         Class<?> cls = null;
         try {
             Log.i(TAG, "Loading class");
             cls = classLoader.loadClass("com.example.dynamiccodeloadingexample.StringFns");
         } catch (Exception e) {
             Log.i(TAG, "Error loading class: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        Object instance = null;
+        try {
+            Log.i(TAG, "Creating instance");
+            instance = cls.newInstance(); // or call a constructor
+        } catch (InstantiationException | IllegalAccessException e) {
+            Log.i(TAG, "Error creating instance: " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -44,16 +54,13 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        // first parameter (Class) is null because the method is static
         int result = 0;
         try {
             Log.i(TAG, "Invoking method");
-            result = (int) countLettersMethod.invoke(null, "Hello");
-        } catch (IllegalAccessException e) {
-            Log.i(TAG, "Illegal Access");
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            Log.i(TAG, "Invocation Target Exception");
+            // first parameter (Object) is null when the method is static
+            result = (int) countLettersMethod.invoke(instance, "Hello"); // pass instance instead of null
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            Log.i(TAG, "Error invoking method: " + e.getMessage());
             e.printStackTrace();
         }
 

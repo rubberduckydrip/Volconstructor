@@ -14,10 +14,11 @@ console.log("Hello World!");
 
 // Find class and use it
 setTimeout(function() {
-  var className = "com.example.dynamiccodeloadingexample.StringFns";
+  var className = "com.example.dynamiccodeloadingexample.HelloWorld";
   console.log("Finding class");
 
   var classFactory;
+  // searching for class in all class loaders
   const classLoaders = Java.enumerateClassLoadersSync();
   for (const classLoader in classLoaders) {
     try {
@@ -32,30 +33,43 @@ setTimeout(function() {
     }
   }
 
+  // create reference to class
   var classToDump= classFactory.use(className);
+  // works till here
 
-  var classLoader = Java.use(className).classLoader;
-  var classLoaderClass = Java.use("java.lang.ClassLoader");
-  var classToDump = Java.cast(classLoaderClass.loadClass.overload('java.lang.String').call(classLoader, className), Java.use(className));
 
-  // Find the memory range where the class is loaded
-  var classPtr = classToDump.$staticClass.$handle;
-  var classSize = Memory.readU32(classPtr.add(Process.pointerSize));
-  var classMemory = Memory.scanSync(classPtr, classSize, "r--")[0];
-
-  // Read the contents of the memory range into a byte array
-  var classBytes = Memory.readByteArray(classMemory.address, classMemory.size);
-
-  // Write the byte array to a file
-  var filename = className.replace(/\./g, "_") + ".class";
-  var file = new File(filename, "wb");
-  file.write(classBytes);
-  file.flush();
-  file.close();
-
-  console.log("Class dumped to " + filename);
-  
-}, 5000);
+  var counter = 0;
+  // Iterate over all loaded modules to find the one that contains the class
+  Process.enumerateModules({
+    onMatch: function (module) {
+      console.log("Checking module " + module.name);
+      if (module.name.includes("dex")) {
+        var base = module.base;
+        var size = module.size;
+        console.log("Found module " + module.name + " at " + base + " with size " + size);
+        
+        console.log("[*] Dumping " + module.name);
+        var ranges = Process.enumerateRangesSync({protection: 'r--', coalesce: true});
+        for (var i = 0; i < ranges.length; i++) {
+          var range = ranges[i];
+          if (range.base.equals(ptr(module.base))) {
+            var filename = "/data/user/0/com.example.dynamiccodeloadingexample/files/" + module.name + "_" + range.base.toString() + ".bin";
+            console.log("[*] Writing " + range.size + " bytes to " + filename);
+            var fd = new File(filename, 'wb');
+            fd.write(Memory.readByteArray(range.base, range.size));
+            fd.flush();
+            fd.close();
+            console.log("[*] Done!");
+            break;
+          }
+        }
+      }
+    },
+    onComplete: function () {
+      console.log("Module enumeration complete");
+    }
+  });
+}, 10000);
 
 
 
