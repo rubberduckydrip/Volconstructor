@@ -1,5 +1,7 @@
 console.log("Hello World!");
 
+var dir = "/data/user/0/com.example.dynamiccodeloadingexample/dumps/";
+
 // Find class and use it
 setTimeout(function() {
   var counter = 0;
@@ -17,13 +19,14 @@ setTimeout(function() {
         for (var i = 0; i < ranges.length; i++) {
           var range = ranges[i];
           if (range.base.equals(ptr(module.base))) {
-            var filename = "/data/user/0/com.example.dynamiccodeloadingexample/files/dump/" + module.name + "_" + range.base.toString() + ".bin";
+            var filename = dir + module.name + "_" + range.base.toString() + ".bin";
             console.log("[*] Writing " + range.size + " bytes to " + filename);
             var fd = new File(filename, 'wb');
             fd.write(Memory.readByteArray(range.base, range.size));
             fd.flush();
             fd.close();
             console.log("[*] Done!");
+            send(filename);
             break;
           }
         }
@@ -33,4 +36,5 @@ setTimeout(function() {
       console.log("Module enumeration complete");
     }
   });
+
 }, 5000);

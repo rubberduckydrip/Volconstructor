@@ -4,28 +4,32 @@
 import frida
 import time
 from adbutils import adb
+import os
 
-download_count = 0
+# Global variables
+package = "com.example.dynamiccodeloadingexample"
 
+# Functions
 def on_message(message, data):
     if(message['type'] == 'send'):
         print("[+] Received: ")
         print(message['payload'])
-        download_file(message['payload'])
+        download(message['payload'])
 
-def download_file(file):
-    global download_count
+def download(item):
     device = adb.device()
 
-    print("[+] Pulling file: " + file)
-    device.sync.pull(file, "outputs/" + "dynamic_code_" + str(download_count) + ".dump")
-    download_count = download_count + 1
+    print("[+] Pulling " + item)
+    file_name = os.path.basename(item)
+    device.sync.pull(item, "outputs/" + file_name)
 
+# Main
+print("[+] Waiting for process to start...")
 device = frida.get_usb_device()
 
 while True:
     try:
-        process = device.get_process("Dynamic Code Loading Example")
+        process = device.get_process(package)
         break
     except frida.ProcessNotFoundError:
         
@@ -33,9 +37,9 @@ while True:
 
 # time.sleep(1) #Without it Java.perform silently fails
 session = device.attach(process.pid)
-script = session.create_script(open("s2.js").read())
+script = session.create_script(open("script.js").read())
 script.on('message', on_message)
 script.load()
 
-#prevent the python script from terminating
+# prevent the python script from terminating
 input()

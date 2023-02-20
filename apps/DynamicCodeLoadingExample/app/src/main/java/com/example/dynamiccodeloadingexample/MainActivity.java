@@ -22,11 +22,13 @@ public class MainActivity extends AppCompatActivity {
         String path = context.getFilesDir().getAbsolutePath();
         Log.i(TAG, "PATH: " + path);
 
+        // load the apk
         String apkPath = path + "/dynamic-code.apk";
+        Log.i(TAG, "Looking for apk at: " + apkPath);
 
-        final DexClassLoader classLoader = new DexClassLoader(apkPath, context.getCacheDir().getAbsolutePath(), null, this.getClass().getClassLoader());
+        ClassLoader classLoader = new DexClassLoader(apkPath, context.getCacheDir().getAbsolutePath(), null, this.getClass().getClassLoader());
 
-
+        // load the class
         Class<?> cls = null;
         try {
             Log.i(TAG, "Loading class");
@@ -36,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        // create an instance of the class
         Object instance = null;
         try {
             Log.i(TAG, "Creating instance");
@@ -45,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        // load the method
         Method countLettersMethod = null;
         try {
             Log.i(TAG, "Loading method");
@@ -54,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        // invoke the method
         int result = 0;
         try {
             Log.i(TAG, "Invoking method");
@@ -64,6 +69,16 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        // suggest removal from memory
+//        Log.i(TAG, "Suggesting removal from memory");
+//        countLettersMethod = null;
+//        instance = null;
+//        cls = null;
+//        classLoader = null;
+//        System.gc();
+
+
+        // print the result
         Log.i(TAG, "Answer: " + result);
     }
 
