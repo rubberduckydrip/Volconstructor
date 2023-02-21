@@ -12,8 +12,7 @@ package = "com.example.dynamiccodeloadingexample"
 # Functions
 def on_message(message, data):
     if(message['type'] == 'send'):
-        print("[+] Received: ")
-        print(message['payload'])
+        print("[+] Received: " + message['payload'])
         download(message['payload'])
 
 def download(item):
@@ -30,6 +29,7 @@ device = frida.get_usb_device()
 while True:
     try:
         process = device.get_process(package)
+        print("[+] Process found: " + str(process.pid))
         break
     except frida.ProcessNotFoundError:
         
@@ -40,6 +40,10 @@ session = device.attach(process.pid)
 script = session.create_script(open("script.js").read())
 script.on('message', on_message)
 script.load()
+package_path = "/data/user/0/" + package + "/dumps/"
+script.post({"type": "path", "payload": package_path})
+# script.post({"type": "directory", "value": package})
+# print("[+] Sent directory to script.js")
 
 # prevent the python script from terminating
 input()
